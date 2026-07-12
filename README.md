@@ -90,7 +90,7 @@ Without them the app falls back to public STUN, which may not connect.
 draw.py            Desktop app + all gesture/drawing helpers
 streamlit_app.py   Browser app (reuses helpers from draw.py)
 requirements.txt   Python deps for the web version
-packages.txt       apt libs for Streamlit Cloud (libgl1, libglib2.0-0)
+packages.txt       apt libs for Streamlit Cloud (libgl1, libglib2.0-0t64)
 models/            Hand-landmarker model (auto-downloaded)
 ```
 
