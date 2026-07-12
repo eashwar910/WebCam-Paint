@@ -24,6 +24,7 @@ from collections import deque
 import av
 import cv2 as cv
 import numpy as np
+import requests
 import streamlit as st
 from streamlit_webrtc import WebRtcMode, webrtc_streamer
 
@@ -40,18 +41,22 @@ def get_ice_servers():
     """Return ICE servers for WebRTC.
 
     Community Cloud sits behind NAT/firewall, so a TURN server is usually
-    required for the video stream to connect. Twilio is the most reliable
-    option; add TWILIO_ACCOUNT_SID / TWILIO_AUTH_TOKEN in the app's Secrets to
-    enable it. Without them we fall back to a public STUN server, which works
-    on some networks but often fails on Community Cloud.
+    required for the video stream to connect. We use Metered's free Open
+    Relay TURN service; add METERED_API_KEY / METERED_SUBDOMAIN in the app's
+    Secrets to enable it. Without them we fall back to a public STUN server,
+    which works on some networks but often fails on Community Cloud.
     """
     try:
-        account_sid = st.secrets["TWILIO_ACCOUNT_SID"]
-        auth_token = st.secrets["TWILIO_AUTH_TOKEN"]
-        from twilio.rest import Client
+        api_key = st.secrets["METERED_API_KEY"]
+        subdomain = st.secrets["METERED_SUBDOMAIN"]
 
-        token = Client(account_sid, auth_token).tokens.create()
-        return token.ice_servers
+        resp = requests.get(
+            f"https://{subdomain}.metered.live/api/v1/turn/credentials",
+            params={"apiKey": api_key},
+            timeout=5,
+        )
+        resp.raise_for_status()
+        return resp.json()
     except Exception:
         return [{"urls": ["stun:stun.l.google.com:19302"]}]
 
@@ -183,5 +188,5 @@ with st.expander("Deployment note / performance"):
         "- MediaPipe runs **on the server**, so frame rate depends on the host. "
         "On Streamlit Community Cloud (shared CPU) expect a laggy ~5–15 fps.\n"
         "- If the video never connects on Community Cloud, you almost certainly "
-        "need a **TURN server** — add Twilio credentials in *Settings → Secrets*."
+        "need a **TURN server** — add Metered credentials in *Settings → Secrets*."
     )

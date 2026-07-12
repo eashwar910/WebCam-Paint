@@ -69,12 +69,13 @@ streamlit run streamlit_app.py
 3. Open the app, click **START**, and allow camera access.
 
 **TURN server (usually required):** Community Cloud sits behind NAT, so the video
-stream often won't connect with STUN alone. Add Twilio credentials under
-**Settings → Secrets** to enable a TURN server:
+stream often won't connect with STUN alone. This app uses
+[Metered's free Open Relay TURN service](https://www.metered.ca/tools/openrelay/).
+Add your credentials under **Settings → Secrets**:
 
 ```toml
-TWILIO_ACCOUNT_SID = "ACxxxxxxxx"
-TWILIO_AUTH_TOKEN  = "your_auth_token"
+METERED_API_KEY   = "your_api_key"
+METERED_SUBDOMAIN = "your-app-name"   # the xxx in xxx.metered.live
 ```
 
 Without them the app falls back to public STUN, which may not connect.
